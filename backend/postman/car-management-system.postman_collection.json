@@ -2,7 +2,7 @@
   "info": {
     "_postman_id": "a07aad82-8e67-4250-beff-5ec10b4c5af8",
     "name": "Car Management System API",
-    "description": "RESTful API for the Haupcar car management system.\n\nStart the API first (`npm run dev` in `backend/`). Run the **Cars** folder top to bottom, or the whole collection with the Collection Runner: \"Create car\" saves the new id into `carId` for the requests after it.",
+    "description": "RESTful API for the car management system.\n\nStart the API first (`npm run dev` in `backend/`). Run the **Cars** folder top to bottom, or the whole collection with the Collection Runner: \"Create car\" saves the new id into `carId` for the requests after it.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
