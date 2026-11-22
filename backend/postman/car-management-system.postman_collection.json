@@ -1,0 +1,473 @@
+{
+  "info": {
+    "_postman_id": "a07aad82-8e67-4250-beff-5ec10b4c5af8",
+    "name": "Car Management System API",
+    "description": "RESTful API for the Haupcar car management system.\n\nStart the API first (`npm run dev` in `backend/`). Run the **Cars** folder top to bottom, or the whole collection with the Collection Runner: \"Create car\" saves the new id into `carId` for the requests after it.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000/api"
+    },
+    {
+      "key": "carId",
+      "value": "1"
+    }
+  ],
+  "item": [
+    {
+      "name": "Health",
+      "item": [
+        {
+          "name": "Health check",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Database is up', () => pm.expect(pm.response.json().database).to.eql('up'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/health",
+              "host": ["{{baseUrl}}"],
+              "path": ["health"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Cars",
+      "item": [
+        {
+          "name": "List cars",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Returns data and meta', () => {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body.data).to.be.an('array');",
+                  "  pm.expect(body.meta).to.include.keys('page', 'pageSize', 'total', 'totalPages');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cars?page=1&pageSize=10&sortBy=createdAt&order=desc",
+              "host": ["{{baseUrl}}"],
+              "path": ["cars"],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "toyota",
+                  "description": "Search plate, province, brand, model, color, notes",
+                  "disabled": true
+                },
+                {
+                  "key": "brand",
+                  "value": "Toyota",
+                  "description": "Exact brand, case-insensitive",
+                  "disabled": true
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "pageSize",
+                  "value": "10",
+                  "description": "1–100"
+                },
+                {
+                  "key": "sortBy",
+                  "value": "createdAt",
+                  "description": "registrationNumber | province | brand | model | year | createdAt | updatedAt"
+                },
+                {
+                  "key": "order",
+                  "value": "desc",
+                  "description": "asc | desc"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "List brands",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Returns an array of brands', () => pm.expect(pm.response.json().data).to.be.an('array'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cars/brands",
+              "host": ["{{baseUrl}}"],
+              "path": ["cars", "brands"]
+            }
+          }
+        },
+        {
+          "name": "Create car",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('registrationNumber', `9กข ${_.random(1000, 9999)}`);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 201', () => pm.response.to.have.status(201));",
+                  "pm.test('Location header points to the new car', () => {",
+                  "  pm.expect(pm.response.headers.get('Location')).to.eql(`/api/cars/${pm.response.json().data.id}`);",
+                  "});",
+                  "pm.collectionVariables.set('carId', String(pm.response.json().data.id));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"registrationNumber\": \"{{registrationNumber}}\",\n  \"province\": \"กรุงเทพมหานคร\",\n  \"brand\": \"Toyota\",\n  \"model\": \"Camry\",\n  \"year\": 2024,\n  \"color\": \"White\",\n  \"notes\": \"ประจำสาขาสีลม\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/cars",
+              "host": ["{{baseUrl}}"],
+              "path": ["cars"]
+            }
+          }
+        },
+        {
+          "name": "Get car",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Returns the requested car', () => pm.expect(String(pm.response.json().data.id)).to.eql(pm.collectionVariables.get('carId')));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cars/{{carId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["cars", "{{carId}}"]
+            }
+          }
+        },
+        {
+          "name": "Update car",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Fields are updated', () => {",
+                  "  const car = pm.response.json().data;",
+                  "  pm.expect(car.notes).to.eql('เปลี่ยนยางแล้ว');",
+                  "  pm.expect(car.color).to.be.null;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"notes\": \"เปลี่ยนยางแล้ว\",\n  \"color\": \"\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/cars/{{carId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["cars", "{{carId}}"]
+            },
+            "description": "Send only the fields to change. An empty string clears an optional field."
+          }
+        },
+        {
+          "name": "Delete car",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('Status is 204', () => pm.response.to.have.status(204));"]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cars/{{carId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["cars", "{{carId}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Error cases",
+      "item": [
+        {
+          "name": "400 Invalid body",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 400', () => pm.response.to.have.status(400));",
+                  "pm.test('Error code is VALIDATION_ERROR', () => pm.expect(pm.response.json().error.code).to.eql('VALIDATION_ERROR'));",
+                  "pm.test('Lists every invalid field', () => {",
+                  "  const fields = pm.response.json().error.details.map((issue) => issue.field);",
+                  "  pm.expect(fields).to.include.members(['registrationNumber', 'province', 'brand', 'model', 'year']);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"registrationNumber\": \"ABC\",\n  \"brand\": \"\",\n  \"model\": 123,\n  \"year\": 1800\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/cars",
+              "host": ["{{baseUrl}}"],
+              "path": ["cars"]
+            }
+          }
+        },
+        {
+          "name": "400 Invalid query",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 400', () => pm.response.to.have.status(400));",
+                  "pm.test('Error code is VALIDATION_ERROR', () => pm.expect(pm.response.json().error.code).to.eql('VALIDATION_ERROR'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cars?page=0&pageSize=500&sortBy=price",
+              "host": ["{{baseUrl}}"],
+              "path": ["cars"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "0"
+                },
+                {
+                  "key": "pageSize",
+                  "value": "500"
+                },
+                {
+                  "key": "sortBy",
+                  "value": "price"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "400 Invalid id",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 400', () => pm.response.to.have.status(400));",
+                  "pm.test('Error code is VALIDATION_ERROR', () => pm.expect(pm.response.json().error.code).to.eql('VALIDATION_ERROR'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cars/abc",
+              "host": ["{{baseUrl}}"],
+              "path": ["cars", "abc"]
+            }
+          }
+        },
+        {
+          "name": "404 Car not found",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 404', () => pm.response.to.have.status(404));",
+                  "pm.test('Error code is NOT_FOUND', () => pm.expect(pm.response.json().error.code).to.eql('NOT_FOUND'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cars/999999",
+              "host": ["{{baseUrl}}"],
+              "path": ["cars", "999999"]
+            }
+          }
+        },
+        {
+          "name": "409 Duplicate registration number",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 409', () => pm.response.to.have.status(409));",
+                  "pm.test('Error code is CONFLICT', () => pm.expect(pm.response.json().error.code).to.eql('CONFLICT'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"registrationNumber\": \"2กค 5678\",\n  \"province\": \"กรุงเทพมหานคร\",\n  \"brand\": \"Honda\",\n  \"model\": \"Civic\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/cars",
+              "host": ["{{baseUrl}}"],
+              "path": ["cars"]
+            },
+            "description": "Uses a plate from the seed data, so run `npm run db:seed` first."
+          }
+        },
+        {
+          "name": "404 Unknown route",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 404', () => pm.response.to.have.status(404));",
+                  "pm.test('Error code is NOT_FOUND', () => pm.expect(pm.response.json().error.code).to.eql('NOT_FOUND'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/unknown",
+              "host": ["{{baseUrl}}"],
+              "path": ["unknown"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
