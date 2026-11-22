@@ -1,10 +1,11 @@
 import type { ZodError } from 'zod';
 
-import type { ValidationIssue } from '../types/api.types.js';
+import type { RequestLocation, ValidationIssue } from '../types/api.types.js';
 
-export function formatZodError(error: ZodError, prefix?: string): ValidationIssue[] {
+export function formatZodError(error: ZodError, location?: RequestLocation): ValidationIssue[] {
   return error.issues.map((issue) => ({
-    field: [prefix, ...issue.path.map(String)].filter(Boolean).join('.'),
+    ...(location && { location }),
+    field: issue.path.map(String).join('.'),
     message: issue.message,
   }));
 }
