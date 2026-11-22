@@ -18,10 +18,10 @@ const toServiceError = (error: unknown) =>
     : error;
 
 export async function listCars(query: ListCarsQuery) {
-  const { q, brand, page, pageSize, sortBy, order } = query;
+  const { search, brand, page, pageSize, sortBy, order } = query;
 
   const { cars, total } = await carRepository.findMany({
-    search: q,
+    search,
     brand,
     sortBy,
     order,

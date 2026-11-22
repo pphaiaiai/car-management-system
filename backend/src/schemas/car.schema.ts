@@ -54,7 +54,7 @@ export const carIdParamsSchema = z.object({
 });
 
 export const listCarsQuerySchema = z.object({
-  q: optionalQueryText(100),
+  search: optionalQueryText(100),
   brand: optionalQueryText(50),
   page: z.coerce.number().int().min(1).default(1),
   pageSize: z.coerce.number().int().min(1).max(100).default(10),

@@ -75,7 +75,7 @@
               "path": ["cars"],
               "query": [
                 {
-                  "key": "q",
+                  "key": "search",
                   "value": "toyota",
                   "description": "Search plate, province, brand, model, color, notes",
                   "disabled": true
