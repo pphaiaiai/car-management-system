@@ -113,8 +113,13 @@ const cars: Prisma.CarCreateManyInput[] = [
 ];
 
 try {
-  const { count } = await prisma.car.createMany({ data: cars, skipDuplicates: true });
-  console.log(`🌱 Seeded ${count} car(s), skipped ${cars.length - count} existing`);
+  const existing = await prisma.car.count();
+  if (existing > 0) {
+    console.log(`Skipped seeding: the database already has ${existing} car(s)`);
+  } else {
+    const { count } = await prisma.car.createMany({ data: cars });
+    console.log(`Seeded ${count} cars`);
+  }
 } finally {
   await prisma.$disconnect();
 }
