@@ -18,5 +18,38 @@ services:
       timeout: 5s
       retries: 10
 
+  api:
+    build: ./backend
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@db:5432/car_management
+      CORS_ORIGIN: http://localhost:${WEB_PORT:-8080}
+    ports:
+      - '${API_PORT:-3000}:3000'
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'node',
+          '-e',
+          "fetch('http://localhost:3000/api/health').then((r) => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))",
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  web:
+    build: ./frontend
+    restart: unless-stopped
+    ports:
+      - '${WEB_PORT:-8080}:80'
+    depends_on:
+      api:
+        condition: service_healthy
+
 volumes:
   db-data:
