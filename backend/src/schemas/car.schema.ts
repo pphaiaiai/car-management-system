@@ -3,6 +3,9 @@ import { z } from 'zod';
 const MAX_INT32 = 2_147_483_647;
 const MAX_YEAR = new Date().getFullYear() + 1;
 
+// Thai plate: optional leading digit, 1–2 Thai letters, then 1–9999 (e.g. "1กข 1234", "กข 1234").
+const PLATE_PATTERN = /^([1-9]?[ก-ฮ]{1,2})\s*([1-9][0-9]{0,3})$/;
+
 const emptyToNull = (value: unknown) =>
   typeof value === 'string' && value.trim() === '' ? null : value;
 
@@ -51,7 +54,7 @@ export const carIdParamsSchema = z.object({
 });
 
 export const listCarsQuerySchema = z.object({
-  q: optionalQueryText(100),
+  search: optionalQueryText(100),
   brand: optionalQueryText(50),
   page: z.coerce.number().int().min(1).default(1),
   pageSize: z.coerce.number().int().min(1).max(100).default(10),
@@ -62,12 +65,8 @@ export const listCarsQuerySchema = z.object({
 export const createCarSchema = z.object(
   {
     registrationNumber: requiredText('Registration number', 20)
-      .regex(
-        /^[0-9ก-ฮ -]+$/,
-        'Registration number may only contain Thai letters, digits, spaces and hyphens',
-      )
-      .regex(/[0-9]/, 'Registration number must contain at least one digit')
-      .transform((value) => value.replace(/\s+/g, ' ')),
+      .regex(PLATE_PATTERN, 'Registration number must look like "1กข 1234" or "กข 1234"')
+      .transform((value) => value.replace(PLATE_PATTERN, '$1 $2')),
     province: requiredText('Province', 50),
     brand: requiredText('Brand', 50),
     model: requiredText('Model', 100),
