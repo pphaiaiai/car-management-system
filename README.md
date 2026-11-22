@@ -1,8 +1,8 @@
 # Car Management System
 
-A web application for Haupcar Co., Ltd. that replaces the paper notebook used to record the
-company's cars. Staff can add, view, search, edit and delete car records from a browser, and the
-data is stored in a PostgreSQL database behind a RESTful API.
+A web application that replaces a paper notebook for recording a company's cars. Staff can add,
+view, search, edit and delete car records from a browser, and the data is stored in a PostgreSQL
+database behind a RESTful API.
 
 ![Car list](docs/screenshots/car-list.png)
 

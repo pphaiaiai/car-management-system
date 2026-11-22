@@ -2,7 +2,7 @@
   "name": "car-management-backend",
   "version": "0.1.0",
   "private": true,
-  "description": "RESTful API for the Haupcar car management system",
+  "description": "RESTful API for the car management system",
   "type": "module",
   "engines": {
     "node": ">=22.12"
