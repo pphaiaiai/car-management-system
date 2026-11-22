@@ -25,7 +25,7 @@ export type CarSortField =
   'registrationNumber' | 'province' | 'brand' | 'model' | 'year' | 'createdAt' | 'updatedAt';
 
 export interface ListCarsParams {
-  q?: string;
+  search?: string;
   brand?: string;
   page?: number;
   pageSize?: number;
